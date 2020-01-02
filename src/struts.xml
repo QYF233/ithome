@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+    <constant name="struts.i18n.encoding" value="UTF-8"/>
+
+    <!--***************************前台首页***************************-->
+    <package name="index" extends="struts-default" namespace="/">
+
+        <interceptors>
+            <!--定义权限检查拦截器-->
+            <interceptor name="authority" class="com.filter.AuthorityInterceptor"></interceptor>
+            <!--定义一个包含权限检查的拦截器栈-->
+            <interceptor-stack name="mydefault">
+                <!--定义拦截器包含defaultStack拦截器-->
+                <interceptor-ref name="defaultStack"/>
+                <!--定义拦截器包含authority拦截器-->
+                <interceptor-ref name="authority"/>
+            </interceptor-stack>
+        </interceptors>
+
+        <global-results>
+            <result name="login">/login.jsp</result>
+        </global-results>
+
+        <action name="login" class="action.LoginAction">
+            <result name="admin" type="redirectAction">adminIndex</result>
+            <result name="user" type="redirectAction">ithome</result>
+            <result name="error">login.jsp</result>
+            <result name="input">login.jsp</result>
+        </action>
+        <action name="register" class="action.LoginAction" method="register">
+            <result name="success">login.jsp</result>
+            <result name="error">register.jsp</result>
+        </action>
+        <action name="adminIndex" class="action.LoginAction" method="adminIndex">
+            <interceptor-ref name="defaultStack"/>
+            <interceptor-ref name="authority"/>
+            <result name="adminIndex">admin/index.jsp</result>
+        </action>
+
+        <action name="pic" class="action.LoginAction" method="pic">
+            <result name="pic">admin/pic.jsp?pic=${pic}</result>
+        </action>
+        <action name="headPic" class="action.LoginAction" method="headPic">
+            <result name="headPic">headPic.jsp?pic=${pic}</result>
+        </action>
+        <action name="reg" class="action.LoginAction" method="reg">
+            <result name="reg">admin/reg.jsp?messageReg=${messageReg}</result>
+        </action>
+        <!--首页查询列表-->
+        <action name="ithome" class="action.IThomeAction" method="list">
+            <result name="list">index.jsp</result>
+        </action>
+        <!--文章展示列表-->
+        <action name="info" class="action.IThomeAction" method="info">
+            <result name="info">info.jsp</result>
+        </action>
+        <!--文章页添加评论-->
+        <action name="addComment" class="action.CommentAction" method="add">
+            <result name="addComment" type="redirectAction">info</result>
+        </action>
+        <!--当前时间-->
+        <action name="time" class="action.Time" method="getTime">
+            <result>time.jsp</result>
+        </action>
+    </package>
+
+    <!--******************************后台**************************-->
+    <package name="admin" extends="struts-default" namespace="/admin">
+        <!--**************后台拦截器*****************-->
+        <interceptors>
+            <!--定义权限检查拦截器-->
+            <interceptor name="authority" class="com.filter.AuthorityInterceptor"></interceptor>
+            <!--定义一个包含权限检查的拦截器栈-->
+            <interceptor-stack name="mydefault">
+                <!--定义拦截器包含defaultStack拦截器-->
+                <interceptor-ref name="defaultStack"/>
+                <!--定义拦截器包含authority拦截器-->
+                <interceptor-ref name="authority"/>
+            </interceptor-stack>
+        </interceptors>
+
+        <!--全局过滤器-->
+        <default-interceptor-ref name="mydefault"></default-interceptor-ref>
+
+        <global-results>
+            <result name="login">/login.jsp</result>
+        </global-results>
+
+        <!--**************文章*****************-->
+        <!--查询-->
+        <action name="*" class="action.ArticleAction" method="{1}">
+            <result name="list">article.jsp</result>
+        </action>
+        <!--增加-->
+        <action name="add" class="action.ArticleAction" method="add">
+            <result name="add" type="redirectAction">list.action</result>
+            <result name="input">add-article.jsp</result>
+        </action>
+        <!--删除-->
+        <action name="del" class="action.ArticleAction" method="del">
+            <result name="del" type="redirectAction">list.action</result>
+        </action>
+        <!--删除多选-->
+        <action name="delAll" class="action.ArticleAction" method="delAll">
+            <result name="delAll" type="redirectAction">list.action</result>
+        </action>
+        <!--增加前查询下拉列表-->
+        <action name="addQuery" class="action.ArticleAction" method="addQuery">
+            <result name="addQuery">/admin/add-article.jsp</result>
+        </action>
+        <!--更新前查询-->
+        <action name="input" class="action.ArticleAction" method="input">
+            <result name="input">/admin/update-article.jsp</result>
+        </action>
+        <!--更新-->
+        <action name="update" class="action.ArticleAction" method="update">
+            <result name="update" type="redirectAction">list.action</result>
+            <result name="input">update-article.jsp</result>
+        </action>
+
+
+        <!--*************************评论*************************-->
+        <!--查询-->
+        <action name="listComment" class="action.CommentAction" method="list">
+            <result name="list">comment.jsp</result>
+        </action>
+        <!--更新前查询-->
+        <action name="queryComment" class="action.CommentAction" method="queryComment">
+            <result name="queryComment">update-comment.jsp</result>
+        </action>
+        <!--更新-->
+        <action name="updateComment" class="action.CommentAction" method="updateComment">
+            <result name="updateComment" type="redirectAction">listComment.action</result>
+        </action>
+        <!--删除-->
+        <action name="delComment" class="action.CommentAction" method="del">
+            <result name="del" type="redirectAction">listComment.action</result>
+        </action>
+        <!--删除多选-->
+        <action name="delAllComment" class="action.CommentAction" method="delAll">
+            <result name="delAll" type="redirectAction">listComment.action</result>
+        </action>
+
+        <!--***************************分类***********************-->
+        <!--分类列表-->
+        <action name="CategoryList" class="action.CategoryAction" method="CategoryList">
+            <result name="CategoryList">category.jsp</result>
+
+        </action>
+        <!--添加-->
+        <action name="CategoryAdd" class="action.CategoryAction" method="CategoryAdd">
+            <result name="CategoryAdd" type="redirectAction">CategoryList.action</result>
+        </action>
+        <!--删除-->
+        <action name="CategoryDel" class="action.CategoryAction" method="CategoryDel">
+            <result name="CategoryDel" type="redirectAction">CategoryList.action</result>
+        </action>
+        <!--修改前查询-->
+        <action name="queryCategory" class="action.CategoryAction" method="queryCategory">
+            <result name="queryCategory">update-category.jsp</result>
+        </action>
+        <!--修改-->
+        <action name="upCategory" class="action.CategoryAction" method="upCategory">
+            <result name="upCategory" type="redirectAction">CategoryList.action</result>
+        </action>
+
+
+        <!--*********************管理员***************************-->
+        <!--管理员列表-->
+        <action name="adminList" class="action.AdminAction" method="adminList">
+            <result name="adminList">manage-user.jsp</result>
+        </action>
+        <!--添加-->
+        <action name="adminAdd" class="action.AdminAction" method="adminAdd">
+            <result name="adminAdd" type="redirectAction">adminList.action</result>
+        </action>
+        <!--删除-->
+        <action name="adminDel" class="action.AdminAction" method="adminDel">
+            <result name="adminDel" type="redirectAction">adminList.action</result>
+        </action>
+        <!--修改前查询-->
+        <action name="adminQuery" class="action.AdminAction" method="adminQuery">
+            <result name="adminQuery">update-category.jsp</result>
+        </action>
+        <!--修改-->
+        <action name="adminUpdate" class="action.AdminAction" method="adminUpdate">
+            <result name="adminUpdate" type="redirectAction">adminList.action</result>
+        </action>
+
+    </package>
+    <!--email-->
+    <constant name="struts.devMode" value="true"/>
+    <package name="helloworld" extends="struts-default">
+
+        <action name="emailer"
+                class="com.email.Emailer"
+                method="execute">
+            <result name="success">/admin/email/success.jsp</result>
+            <result name="error">/admin/email/error.jsp</result>
+        </action>
+
+    </package>
+    <package name="sort" extends="struts-default" namespace="/">
+        <action name="showsortlist" class="action.ShowSortList">
+            <result name="showsortlist">/sort.jsp</result>
+        </action>
+    </package>
+</struts>
